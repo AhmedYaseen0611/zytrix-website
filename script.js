@@ -25,9 +25,17 @@ const observer = new IntersectionObserver(
   { threshold: 0.16 }
 );
 
-revealItems.forEach((item) => observer.observe(item));
+const isMobileViewport = window.matchMedia('(max-width: 767px)').matches;
+if (isMobileViewport) {
+  revealItems.forEach((item) => item.classList.add('visible'));
+} else {
+  revealItems.forEach((item) => observer.observe(item));
+}
 
-document.getElementById('year').textContent = new Date().getFullYear();
+const yearElement = document.getElementById('year');
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
+}
 
 const heroCard = document.querySelector('.hero-card');
 
@@ -66,5 +74,31 @@ if (contactForm && formStatus) {
     event.preventDefault();
     formStatus.textContent = 'Thanks for reaching out. We will contact you shortly.';
     contactForm.reset();
+  });
+}
+
+// Mobile hamburger toggle (header-only behavior)
+const hamburger = document.querySelector('.hamburger');
+const mobileNav = document.querySelector('.mobile-nav');
+
+if (hamburger && mobileNav) {
+  const closeMobile = () => {
+    mobileNav.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    mobileNav.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+  };
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    mobileNav.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    document.body.classList.toggle('no-scroll', isOpen);
+  });
+
+  mobileNav.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMobile));
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) closeMobile();
   });
 }
